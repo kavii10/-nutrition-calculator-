@@ -1,29 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>NutriVision AI - Nutrition Calculator</title>
+    <title>Nutrition Finder</title>
+    <link rel="stylesheet" href="/static/style.css" />
 </head>
+
 <body>
-    <h1>NutriVision AI Nutrition Lookup</h1>
-    <form id="recipeForm">
-        <input type="text" id="recipeName" name="recipeName" placeholder="Enter recipe name" required>
-        <button type="submit">Get Nutrition</button>
+    <h2>Nutrition Finder</h2>
+    <form id="nfForm">
+        <input type="text" id="recipe" placeholder="Enter recipe name" />
+        <button type="submit">Find Nutrition</button>
     </form>
     <div id="result"></div>
 
     <script>
-    const form = document.getElementById('recipeForm');
-    const resultDiv = document.getElementById('result');
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const recipeName = document.getElementById('recipeName').value.trim();
-        if (!recipeName) return;
-
-        // Call your Flask API endpoint if implemented, else alert rotation
-        alert("This demo runs in terminal. No API frontend implemented yet.");
-    });
+        document.getElementById("nfForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            let recipe = document.getElementById("recipe").value;
+            document.getElementById("result").innerHTML = "Searching...";
+            let res = await fetch("/nutrition", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ recipe })
+            });
+            let data = await res.json();
+            let html = "";
+            if (data.error) {
+                html = "<b style='color:red;'>" + data.error + "</b>";
+            } else if (data.nutrients && data.nutrients.length) {
+                html = `<h3>Nutrition for: ${data.recipe}</h3>`;
+                html += "<table class='nut-table'><tr><th>Nutrient</th><th>Amount</th></tr>";
+                data.nutrients.forEach(nut => {
+                    html += `<tr><td>${nut.nutrient}</td><td>${nut.amount} ${nut.unit}</td></tr>`;
+                });
+                html += "</table>";
+            } else {
+                html = "<b>No nutritional breakdown found for this recipe.</b>";
+            }
+            document.getElementById("result").innerHTML = html;
+        });
     </script>
 </body>
+
 </html>
