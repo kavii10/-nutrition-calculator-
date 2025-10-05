@@ -127,7 +127,15 @@ def convert_to_grams(qty, unit):
     elif u in ['kg', 'kilogram', 'kilograms']:
         return qty * 1000
     elif u in ['mg', 'milligram', 'milligrams']:
-        return qty / 1000
+        return qty / 1000  
+    #adding new lines for improvement
+     elif u in ['cup', 'cups']:
+        return qty * 240  # approximate grams
+    elif u in ['tbsp', 'tablespoon', 'tablespoons']:
+        return qty * 15
+    elif u in ['tsp', 'teaspoon', 'teaspoons']:
+        return qty * 5
+    
     else:
         return qty  # treat unrecognized units as grams
 
